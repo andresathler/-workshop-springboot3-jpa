@@ -1,18 +1,33 @@
 package com.educandoweb.course.controller;
 
 import com.educandoweb.course.model.user.UserEntity;
+import com.educandoweb.course.model.user.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.LinkedList;
+import java.util.List;
 
 @RestController
 @RequestMapping(value="/users")
 public class UserController {
-    @GetMapping(value="/findAll")
-    public ResponseEntity<UserEntity> findAll() {
-        UserEntity u = new UserEntity(1L, "M", "m@gmail.com", "999999999", "123");
+    @Autowired
+    private UserService userService;
 
-        return ResponseEntity.ok().body(u);
+    @GetMapping(value="/findAll")
+    public ResponseEntity<LinkedList<UserEntity>> findAll() {
+        List<UserEntity> users = userService.findAll();
+
+        return ResponseEntity.ok().body(new LinkedList<>(users));
+    }
+
+    @GetMapping(value="/findUserById/{id}")
+    public ResponseEntity<?> findUserById(@PathVariable Long id) {
+        UserEntity user = userService.findUserById(id);
+
+        if(user == null) return ResponseEntity.badRequest().body("Usuario não encontrado");
+
+        return ResponseEntity.ok().body(user);
     }
 }
